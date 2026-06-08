@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import myLogo from './favicon.png';
 import { 
   Search, Plus, Upload, Moon, Sun, Menu, 
   Trash2, Edit2, Loader2, Cloud, CheckCircle2, AlertCircle,
@@ -669,11 +670,7 @@ function App() {
       >
         <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-700 shrink-0 gap-3">
              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30 overflow-hidden">
-                 {siteSettings.favicon ? (
-                    <img src={siteSettings.favicon} alt="" className="w-full h-full object-cover" />
-                 ) : (
-                    "C"
-                 )}
+                 <img src="/favicon.png" alt="Logo" className="w-full h-full object-cover rounded-lg" />
              </div>
             <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent truncate">
               {siteSettings.navTitle || 'CloudNav'}
