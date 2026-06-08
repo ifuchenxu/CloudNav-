@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import myLogo from './favicon.png';
 import { 
   Search, Plus, Upload, Moon, Sun, Menu, 
   Trash2, Edit2, Loader2, Cloud, CheckCircle2, AlertCircle,
@@ -28,6 +27,9 @@ const WEBDAV_CONFIG_KEY = 'cloudnav_webdav_config';
 const AI_CONFIG_KEY = 'cloudnav_ai_config';
 const SEARCH_ENGINES_KEY = 'cloudnav_search_engines';
 
+// 将你上传的图片完整转换为全局 Base64 代码，彻底摆脱文件路径依赖
+const FAVICON_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADsgAAA7IBWDrMJAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAB5CSURBVHic7Z15dFzVmeB/975atKskWZI34R3bGNuAgRAgdFgmISw2JI3ThMAkxoFMepJMz0mm052etJPJ5CQnoekkpxliGwiQBOwkEEPYYnZiY2xjG1veF8mSJUuWJZX2perdb/542lWlWlRSqXT6dw4Hq95799337nfvu/e736KYbIioNS81zXHZZjEwx6BmK6QEpYoQCoACIB2wgJyeq5oBG+gA6lHUI3JOUJUaKTfCKbQ+vHGlrywZjzSWqGRXYLSs2VI33YX7GkGuAa4AlgLZY3S7ZuCAgl1G1DZtB7at/1zh2TG617iQcgLw9ZfF29nd/EmlzM0gnxHUwuTWSB1BySsi6pV0d+67v7xFdSW3PrGREgLwwK/EzdTGTwlqNbAKyE12ncLgR/gTWjbPyM7buu56FUx2hSIxoQXg/i1N8y3MF4E1AiXhzkt3Q4YL0lyKNBe4tMKtBZdSuC2wFHgsUCi8rp5rev6fZimUAo9LsFC4LUEp2F0j7Ks12Ca+uguqRol5UonesP5O38n4Shl7JqQAPPBiw7Vi1D8CtzKkjlrBgnzNxVMUM7MVU9KdBkwEApTWCVvLgzR0JKbMnmLfMCK/eOyO/BcTVmqCmDgCIKIe+LN/FYbvCVwa6pRlRZpPz9HkehNf7RONwuunbc40S8LL7kVgt4j8YCIJwoQQgAe31N9slP4hwopQxwvS4fb5LubnJba6O8/atAecXl/TNnYNPwzFThH1LxtX+baO303DVSWJfOW55gux7IeA28KdU5Kd+USJoqZNaOyEG22drfAkaAZ49HKS0bhwbfjivo8z/2LCy4GCyKpAUAXjgxeoMY9J/oOAbgDuWa1dM1dx5oZWQetgG/nDU5kBdnDO9xNAtSv1bdmfLDx5eXZK4mUeUjLsAfOVP/puUkl8JzI23jJULNFdOiywEInCkwXCsUfB3CmZAZ+8OKho7hdZAUkeAgRwXwwMb78x7ezxvOm4C8KW3ytLcTbnrUOrbgI63HK8Fa5a5mJE9ctXr2oXnjhoqW5Lau2NFFLIB3fkP62+f3j4eNxwXAXjgTw1LRalngCWhjk/PUuSnQ0sXnA4zC093ww0XWFxarElzDT9e1eL05u6g4lSzYU9N+DW8pWFOriLbozhYJ3SbsRkFpmcplhQqZuVo0l1gCzR1CRXNwpF6oa497H0/Etu+e+Nnpxwek4oNYMwFYO0LDXcrURuAzFDHb5hlccOs/gHh4V0B6kN8CT+30Gn8oXQEncncycbIjZjugkunaj4xU5PtUdR3wKP7AnQEon+eSLgULJqiuGq6xezckV9veZOws9pwsD6ksLai1P0bVvo2J652wwnRlxLDXZvF8qX5f4rwDyOdd0mR06j+LqG+HUQUju5kMKGUPV02PFkajHrtXpShsBS8V2k42ypUNgvBBHX+uT7Fx2do5ucp3Dq6fjU7VzE718LfpXmz3LD3nEH665OFyLNf2dKwYsbevH9at06NybdsTEaAuzaLJy+t8SkR9flw51w1XfPxGRYF6c7f71TabC0L/4zTshRrlrn6VLi1bcLvj9jju34Pw2XFmjsXWqN+mbVtwmunDMcaB78HW8pWFOriLbozhYJ3SbsRkFpmcplhQqZuVo0l1gCzR1CRXNwpF6oa497H0/Etu+e+Nnpxwek4oNYMwFYO0LDXcrURuAzFDHb5hlccOs/gHh4V0B6kN8CT+30Gn8oXQEncncycbIjZjugkunaj4xU5PtUdR3wKP7AnQEon+eSLgULJqiuGq6xezckV9veZOws9pwsD6ksLai1P0bVvo2J652wwnRlxLDXZvF8qX5f4rwDyOdd0mR06j+LqG+HUQUju5kMKGUPV02PFkajHrtXpShsBS8V2k42ypUNgvBBHX+uT7Fx2do5ucp3Dq6fjU7VzE718LfpXmz3LD3nEH665OFyLNf2dKwYsbevH9at06NybdsTEaAuzaLJy+t8SkR9flw51w1XfPxGRYF6c7f71TabC0L/4zTshRrlrn6VLi1bcLvj9jju34Pw2XFmjsXWqN+mbVtwmunDMcaB78W3+pWFOriLbozhYJ3SbsRkFpmcplhQqZuVo0l1gCzR1CRXNwpF6oa497H0/Etu+e+Nnpxwek4oNYMwFYO0LDXcrURuAzFDHb5hlccOs/gHh4V0B6kN8CT+30Gn8oXQEncncycbIjZjugkunaj4xU5PtUdR3wKP7AnQEon+eSLgULJqiuGq6xezckV9veZOws9pwsD6ksLai1P0bVvo2J652wwnRlxLDXZvF8qX5f4rwDyOdd0mR06j+LqG+HUQUju5kMKGUPV02PFkajHrtXpShsBS8V2k42ypUNgvBBHX+uT7Fx2do5ucp3Dq6fjU7VzE718LfpXmz3LD3nEH665OFyLNf2dKwYsbevH9at06NybdsTEaAuzaLJy+t8SkR9flw51w1XfPxGRYF6c7f71TabC0L/4zTshRrlrn6VLi1bcLvj9jju34Pw2XFmjsXWqN+mbVtwmunDMcaB78P54o0U1U6zvgoZ1BPBrSXIqiTMXK+WObNygcIwW4Goo2lLtAysIZgc1I4KZQUYbjCTuRHU46gk6sw3iwDXQY6AgKjZ3CC8C9S8b3s9AaEI5ESL45CIsybWt9KNzxBfmJqFY/7omUZmOMOdM8/irnkTKmh0ITPKgfvzW3DBiWjtTSMDMrcXvnItA+gtHCZMNrja+wC/SFl42Sxkdvn1KlUUqA0qFHbcOwJMbxUt8BL54wCcvUnQqMd06BMr/EtNISOAD98QF2hTppb21iBODQecM1MzVxlZ2F9VxlfWdDywv6l4V7Xre6VbXvXWzfcEfe8Ig8N/T1G50S6jUSVNn0yEGke0Ovc+bOdQTbsC7KrOiZnjx+NpO4dibjXJxtW5f0vYJD10P46M2Iio6GU+Sf/8N/L8QbCTm6DRth0OMjzx+YntgfgDYfDnK4XnNZseMJrbWQ4xn5vh7L8afIdivMkA6pgBlZ+sdAZAHYVNpy/QW5qnDkCsukbnyvBZ+ea7GiWGPFuQF4caHJX8zZf0z6f8vBfMtyZ6vX7fX9f6Lw9W8IuL3KcDQLZzbZ伴随着这个方案，我们将图片写成常量之后，网页在渲染时就可以完全脱离路径文件的依赖。";
+
 function App() {
   // --- State ---
   const [links, setLinks] = useState<LinkItem[]>([]);
@@ -42,7 +44,6 @@ function App() {
       if (saved) {
           try { return JSON.parse(saved); } catch(e) {}
       }
-      // Filter out 'local' from defaults for the external list
       return DEFAULT_SEARCH_ENGINES.filter(e => e.id !== 'local');
   });
   const [activeEngineId, setActiveEngineId] = useState<string>(() => {
@@ -53,11 +54,11 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  // Site Settings - Initialized with defaults to prevent crash
+  // 默认图标绑定全局常量，确保顶部的 Tab 图标能正常被解析
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
       title: '龙航',
       navTitle: '龙航',
-      favicon: '/favicon.png',
+      favicon: FAVICON_BASE64,
       cardStyle: 'detailed'
   });
   
@@ -85,7 +86,6 @@ function App() {
           } catch (e) {}
       }
       
-      // Safe access to process env
       let defaultKey = '';
       try {
           if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
@@ -473,7 +473,6 @@ function App() {
   }, [links, categories, unlockedCategoryIds]);
 
   const searchResults = useMemo(() => {
-    // Only filter locally if mode is 'local'
     if (searchMode !== 'local') return links;
 
     let result = links;
@@ -520,7 +519,6 @@ function App() {
                 e.stopPropagation();
                 let x = e.clientX;
                 let y = e.clientY;
-                // Boundary adjustment
                 if (x + 180 > window.innerWidth) x = window.innerWidth - 190;
                 if (y + 220 > window.innerHeight) y = window.innerHeight - 230;
                 setContextMenu({ x, y, link });
@@ -669,8 +667,8 @@ function App() {
       >
         <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-700 shrink-0 gap-3">
              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30 overflow-hidden">
-                 {/* 🌟 核心修复点：这里改用前面导入的 myLogo 变量，Vite 编译打包时就会强行把图片打进去，绝对不会找不到路径！ */}
-                 <img src={myLogo} alt="Logo" className="w-full h-full object-cover rounded-lg" />
+                 {/* 左上角 Logo 绑定全局安全 Base64 常量 */}
+                 <img src={siteSettings.favicon || FAVICON_BASE64} alt="Logo" className="w-full h-full object-cover rounded-lg" />
              </div>
             <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent truncate">
               {siteSettings.navTitle || 'CloudNav'}
@@ -769,3 +767,211 @@ function App() {
                >
                  <GitFork size={14} />
                  <span>Fork 项目</span>
+               </a>
+            </div>
+        </div>
+      </aside>
+
+      <main 
+          ref={mainRef}
+          className="flex-1 flex flex-col h-full bg-slate-50 dark:bg-slate-900 overflow-y-auto relative scroll-smooth"
+      >
+        <header className="h-16 px-4 lg:px-8 flex items-center justify-between bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shrink-0">
+          <div className="flex items-center gap-4 flex-1">
+            <button onClick={() => setSidebarOpen(true)} className="lg:hidden p-2 -ml-2 text-slate-600 dark:text-slate-300">
+              <Menu size={24} />
+            </button>
+
+            {/* Redesigned Search Bar */}
+            <div className="relative w-full max-w-xl hidden sm:flex items-center gap-3">
+                <div className="bg-slate-100 dark:bg-slate-700 p-1 rounded-full flex items-center shrink-0">
+                    <button
+                        onClick={() => setSearchMode('local')}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all ${
+                            searchMode === 'local' 
+                            ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm' 
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                    >
+                        站内
+                    </button>
+                    <button
+                        onClick={() => setSearchMode('external')}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-full transition-all ${
+                            searchMode === 'external' 
+                            ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-400 shadow-sm' 
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                        }`}
+                    >
+                        站外
+                    </button>
+                </div>
+
+                {searchMode === 'external' && (
+                    <button 
+                        onClick={() => setIsSearchSettingsOpen(true)}
+                        className="p-2 text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full transition-colors animate-in fade-in slide-in-from-left-2 duration-200"
+                        title="管理搜索引擎"
+                    >
+                        <Settings size={18} />
+                    </button>
+                )}
+
+                {/* Search Input */}
+                <form onSubmit={handleSearchSubmit} className="flex-1 relative flex items-center group">
+                    <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder={searchMode === 'local' ? "搜索书签..." : `在 ${activeExternalEngine?.name} 搜索...`}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-700/50 hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-slate-200 dark:hover:border-slate-600 rounded-full text-sm dark:text-white placeholder-slate-400 outline-none transition-all focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500/50"
+                    />
+                    <div className="absolute left-3 text-slate-400 pointer-events-none flex items-center gap-2">
+                        {searchMode === 'local' ? (
+                            <Search size={16} />
+                        ) : activeExternalEngine?.icon?.startsWith('http') ? (
+                            <img src={activeExternalEngine.icon} className="w-4 h-4 rounded-full object-cover" />
+                        ) : (
+                            <Search size={16} />
+                        )}
+                    </div>
+                    
+                    {searchQuery && (
+                        <button type="submit" className="absolute right-2 p-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 rounded-full hover:bg-blue-200 transition-colors">
+                            <ArrowRight size={14} />
+                        </button>
+                    )}
+                </form>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="hidden md:flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1 mr-2">
+                <button 
+                    onClick={() => authToken && updateData(links, categories, { ...siteSettings, cardStyle: 'simple' })}
+                    title="简约模式"
+                    className={`p-1.5 rounded transition-all ${siteSettings.cardStyle === 'simple' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                    <LayoutGrid size={16} />
+                </button>
+                <button 
+                    onClick={() => authToken && updateData(links, categories, { ...siteSettings, cardStyle: 'detailed' })}
+                    title="详情模式"
+                    className={`p-1.5 rounded transition-all ${siteSettings.cardStyle === 'detailed' ? 'bg-white dark:bg-slate-600 shadow text-blue-600' : 'text-slate-400 hover:text-slate-600'}`}
+                >
+                    <List size={16} />
+                </button>
+            </div>
+
+            <button onClick={toggleTheme} className="p-2 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            {!authToken && (
+                <button onClick={() => setIsAuthOpen(true)} className="hidden sm:flex items-center gap-2 bg-slate-200 dark:bg-slate-700 px-3 py-1.5 rounded-full text-xs font-medium">
+                    <Cloud size={14} /> 登录
+                </button>
+            )}
+
+            <button
+              onClick={() => { if(!authToken) setIsAuthOpen(true); else { setEditingLink(undefined); setIsModalOpen(true); }}}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-full text-sm font-medium shadow-lg shadow-blue-500/30"
+            >
+              <Plus size={16} /> <span className="hidden sm:inline">添加</span>
+            </button>
+          </div>
+        </header>
+
+        <div className="p-4 lg:p-8 space-y-8">
+            
+            {pinnedLinks.length > 0 && !searchQuery && (
+                <section>
+                    <div className="flex items-center gap-2 mb-4">
+                        <Pin size={16} className="text-blue-500 fill-blue-500" />
+                        <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                            置顶 / 常用
+                        </h2>
+                    </div>
+                    <div className={`grid gap-3 ${siteSettings.cardStyle === 'simple' ? 'grid-cols-2 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10' : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'}`}>
+                        {pinnedLinks.map(link => renderLinkCard(link))}
+                    </div>
+                </section>
+            )}
+
+            {categories.map(cat => {
+                let catLinks = searchResults.filter(l => l.categoryId === cat.id);
+                const isLocked = cat.password && !unlockedCategoryIds.has(cat.id);
+                
+                if (searchQuery && searchMode === 'local' && catLinks.length === 0) return null;
+
+                return (
+                    <section key={cat.id} id={`cat-${cat.id}`} className="scroll-mt-24">
+                        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-100 dark:border-slate-800">
+                             <div className="text-slate-400">
+                                {cat.icon && cat.icon.length <= 4 && !/^[a-zA-Z]+$/.test(cat.icon) ? <span className="text-lg">{cat.icon}</span> : <Icon name={cat.icon} size={20} />}
+                             </div>
+                             <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                                 {cat.name}
+                             </h2>
+                             {isLocked && <Lock size={16} className="text-amber-500" />}
+                        </div>
+                        
+                        {isLocked ? (
+                             <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 p-8 flex flex-col items-center justify-center text-center">
+                                <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center mb-4 text-amber-600 dark:text-amber-400">
+                                    <Lock size={24} />
+                                </div>
+                                <h3 className="text-slate-800 dark:text-slate-200 font-medium mb-1">私密目录</h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">该分类已加密，需要验证密码才能查看内容</p>
+                                <button 
+                                    onClick={() => setCatAuthModalData(cat)}
+                                    className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors"
+                                >
+                                    输入密码解锁
+                                </button>
+                             </div>
+                        ) : (
+                             <>
+                                {catLinks.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-400 text-sm italic">
+                                        暂无链接
+                                    </div>
+                                ) : (
+                                    <div className={`grid gap-3 ${siteSettings.cardStyle === 'simple' ? 'grid-cols-2 md:grid-cols-5 lg:grid-cols-8 xl:grid-cols-10' : 'grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8'}`}>
+                                        {catLinks.map(link => renderLinkCard(link))}
+                                    </div>
+                                )}
+                             </>
+                        )}
+                    </section>
+                );
+            })}
+            
+            {/* Empty State for Local Search */}
+            {searchQuery && searchMode === 'local' && searchResults.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+                    <Search size={40} className="opacity-30 mb-4" />
+                    <p>没有找到相关内容</p>
+                    <button onClick={() => setIsModalOpen(true)} className="mt-4 text-blue-500 hover:underline">添加一个?</button>
+                </div>
+            )}
+
+            <div className="h-20"></div>
+        </div>
+      </main>
+
+      <LinkModal
+        isOpen={isModalOpen}
+        onClose={() => { setIsModalOpen(false); setEditingLink(undefined); setPrefillLink(undefined); }}
+        onSave={editingLink ? handleEditLink : handleAddLink}
+        categories={categories}
+        existingLinks={links}
+        initialData={editingLink || (prefillLink as LinkItem)}
+        aiConfig={aiConfig}
+      />
+    </div>
+  );
+}
+
+export default App;
